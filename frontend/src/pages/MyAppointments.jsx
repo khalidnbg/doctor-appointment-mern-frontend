@@ -14,7 +14,7 @@ const MyAppointments = () => {
         {doctors.slice(0, 2).map((item, index) => (
           <div
             key={index}
-            className="grid grid-cols-[1fr_2fr] sm:flex sm:gap-6 py-2 border-b"
+            className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
           >
             <div>
               <img src={item.image} alt="" className="w-32 bg-indigo-50" />
@@ -34,7 +34,9 @@ const MyAppointments = () => {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 justify-end">
+            <div />
+
+            <div className="flex flex-col gap-2 justify-end ">
               <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2  border rounded hover:bg-primary hover:text-white transition-all duration-300">
                 Pay Online
               </button>
