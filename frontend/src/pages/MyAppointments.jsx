@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+
+import { AppContext } from "../context/AppContext";
 
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
@@ -68,6 +69,29 @@ const MyAppointments = () => {
     }
   };
 
+  const appointmentStripe = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/user/payment-stripe`,
+        { appointmentId },
+        {
+          headers: { token },
+        }
+      );
+
+      if (data.success && data.sessionUrl) {
+        // Redirect to Stripe Checkout session
+        window.location.href = data.sessionUrl;
+      } else {
+        console.error("Payment initiation failed:", data.message);
+        alert("Unable to initiate payment. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      alert("Error occurred while initiating payment.");
+    }
+  };
+
   useEffect(() => {
     if (token) {
       getUsersAppointments();
@@ -113,8 +137,16 @@ const MyAppointments = () => {
             <div />
 
             <div className="flex flex-col gap-2 justify-end ">
-              {!item.cancelled && (
-                <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2  border rounded hover:bg-primary hover:text-white transition-all duration-300">
+              {!item.cancelled && item.payment && (
+                <button className="sm:min-w-48 py-2 border rounded text-stone-500 bg-indigo-50">
+                  Paid
+                </button>
+              )}
+              {!item.cancelled && !item.payment && (
+                <button
+                  onClick={() => appointmentStripe(item._id)}
+                  className="text-sm text-stone-500 text-center sm:min-w-48 py-2  border rounded hover:bg-primary hover:text-white transition-all duration-300"
+                >
                   Pay Online
                 </button>
               )}
@@ -127,7 +159,7 @@ const MyAppointments = () => {
                 </button>
               )}
               {item.cancelled && (
-                <button className="sm:miw48 py-2 border border-red-500 rounded text-red-500">
+                <button className="sm:miw48 py-2 px-4 border border-red-500 rounded text-red-500">
                   Appointment Cancelled
                 </button>
               )}
